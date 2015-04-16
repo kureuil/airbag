@@ -1,11 +1,14 @@
 import sys
 from .testrunner import TestRunner
-from .testconfig import TestConfig
+from .config.toml import TomlConfig
 
 def cli():
-	config = TestConfig.from_toml("airbag.toml")
-	if config == {}:
+	try:
+		config = TomlConfig("airbag.toml")
+	except ValueError:
+		print('Error during configuration file parsing. Aborting...')
 		sys.exit(1)
+
 	runner = TestRunner(config)
 	if runner.launch() != 0:
 		sys.exit(1)

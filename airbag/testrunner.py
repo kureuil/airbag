@@ -2,9 +2,9 @@ from time import time
 
 class TestRunner(object):
 	"""docstring for TestRunner"""
-	def __init__(self, tests):
+	def __init__(self, config):
 		super(TestRunner, self).__init__()
-		self.tests = tests
+		self.tests = config.tests
 	
 	def launch(self):
 		starttime = time()
