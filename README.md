@@ -12,7 +12,7 @@ To use airbag, you need an airbag.toml in the current working directory. This fi
 
 # Configuration
 
-Configuration is done inside the `airbag.toml` file, written in [Toml](htpp://github.com/toml-lang/toml).
+Configuration is done inside the `airbag.toml` file, written in [Toml](http://github.com/toml-lang/toml).
 
 There's a table named `global` and a table array named `tests`. The `global` table properties' are scoped to all the tests. For each test you can define :
 
