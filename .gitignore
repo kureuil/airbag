@@ -4,3 +4,6 @@ venv
 build
 dist
 *.zip
+*.toml
+*.egg
+airbag.egg-info/
