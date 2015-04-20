@@ -12,6 +12,9 @@ class TestRunner(object):
 		for test in self.tests:
 			if test.run() == False:
 				failures += 1
-		print('Ran {0} tests in {1:.1f} seconds.'.format(len(self.tests), time() - starttime))
-		print('{0} of them failed.'.format(failures))
+		tests = len(self.tests)
+		success = len(self.tests) - failures
+		percentage = success / tests * 100
+		print('Ran {0} tests in {1:.1f} seconds.'.format(tests, time() - starttime))
+		print('[{0:.0f}%] Success: {1} Failures: {2}'.format(percentage, success, failures))
 		return failures
