@@ -4,11 +4,19 @@ Simple testrunner written in Python.
 
 # Installation
 
-Clone this repo and run in a terminal `sudo python3 setup.py install`
+Clone this repo and run in a terminal:
+
+```bash
+# python3 setup.py install
+```
 
 # Usage
 
-To use airbag, you need an airbag.toml in the current working directory. This file is used to define the tests that will run.
+To use airbag, you need an airbag.toml in the current working directory, then type:
+
+```bash
+$ testrunner
+```
 
 # Configuration
 
