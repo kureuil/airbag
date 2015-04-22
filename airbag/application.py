@@ -1,7 +1,7 @@
 from sys import exit, version_info
 
-if (version_info < (3, 2, 0)):
-	print('Python 3.2 is required to run this program')
+if (version_info < (3, 3, 0)):
+	print('Python 3.3 is required to run this program')
 	exit(1)
 
 from .testrunner import TestRunner
