@@ -14,7 +14,9 @@ class TestRunner(object):
 				failures += 1
 		tests = len(self.tests)
 		success = len(self.tests) - failures
-		percentage = success / tests * 100
+		percentage = 0
+		if tests > 0:
+			percentage = success / tests * 100
 		print('Ran {0} tests in {1:.1f} seconds.'.format(tests, time() - starttime))
 		print('[{0:.0f}%] Success: {1} Failures: {2}'.format(percentage, success, failures))
 		return failures
