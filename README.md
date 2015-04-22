@@ -30,6 +30,8 @@ There's a table named `global` and a table array named `tests`. The `global` tab
 - `args` [array]\(default: []) : the default program arguments
 - `input` [string]\(default: '') : the program standard input
 - `timeout` [int]\(default: 15) : time given to the program to finish its execution
+- `emptyenv` [bool]\(default: false) : should the environment be emptied before executing the program
+- `env` [table]\(default: {}) : environment keys to be set. Overrides already defined keys.
 - `expected` [string|table]\(default: '') : table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
  - `output` [string]\(default: '') : expected standard output. Can be a file.
  - `errors` [string]\(default: '') : expected standard error. Can be a file.
@@ -50,6 +52,10 @@ args = []
 name = "It should work with invalid parameters"
 args = ["Hello", "World", "--invalid-opt"]
 expected = ""
+emptyenv = true
+    [tests.env]
+    PATH = "/usr/bin"
+    USER = "kureuil"
 
 [[tests]]
 name = "Testing another program"
