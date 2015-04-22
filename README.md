@@ -1,4 +1,4 @@
-# airbag
+# Airbag
 
 Simple testrunner written in Python.
 
@@ -24,16 +24,18 @@ Configuration is done inside the `airbag.toml` file, written in [Toml](http://gi
 
 There's a table named `global` and a table array named `tests`. The `global` table properties' are scoped to all the tests. For each test you can define :
 
-- `project` [string] : the project name
-- `program` [string] : the default program to be run
-- `name` [string] : the test's name
-- `args` [array] : the default program arguments
-- `expected` [string|table] : table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
- - `output` [string] : expected standard output. Can be a file.
- - `errors` [string] : expected standard error. Can be a file.
- - `returncode` [integer] : expected exit code.
+- `project` [string](default: '') : the project name
+- `program` [string](mandatory) : the default program to be run
+- `name` [string](default: '') : the test's name
+- `args` [array](default: []) : the default program arguments
+- `input` [string](default: '') : the program standard input
+- `timeout` [int](default: 15) : time given to the program to finish its execution
+- `expected` [string|table](default: '') : table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
+ - `output` [string](default: '') : expected standard output. Can be a file.
+ - `errors` [string](default: '') : expected standard error. Can be a file.
+ - `returncode` [integer](default: 0) : expected exit code.
 
-You can compare `expected.output` & `expected.errors` to a file contents by prefixing the file path with `file:`.
+`input`, `expected.output` & `expected.errors` can be assigned to a file contents by setting their value to the file path prefixed by `file:`.
 
 # Example
 
@@ -53,6 +55,8 @@ expected = ""
 name = "Testing another program"
 program = "echo"
 args = ["-n", "Hello", "World"]
+timeout = 2
+input = "file:input.txt"
     [tests.expected]
     returncode = 0
     errors = "file:empty-file.txt"
