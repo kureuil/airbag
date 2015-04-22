@@ -24,18 +24,18 @@ Configuration is done inside the `airbag.toml` file, written in [Toml](http://gi
 
 There's a table named `global` and a table array named `tests`. The `global` table properties' are scoped to all the tests. For each test you can define :
 
-- `project` [string]\(default: '') : the project name
+- `project` [string]\(default: `''`) : the project name
 - `program` [string]\(mandatory) : the default program to be run
-- `name` [string]\(default: '') : the test's name
-- `args` [array]\(default: []) : the default program arguments
-- `input` [string]\(default: '') : the program standard input
-- `timeout` [int]\(default: 15) : time given to the program to finish its execution
-- `emptyenv` [bool]\(default: false) : should the environment be emptied before executing the program
-- `env` [table]\(default: {}) : environment keys to be set. Overrides already defined keys.
-- `expected` [string|table]\(default: '') : table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
- - `output` [string]\(default: '') : expected standard output. Can be a file.
- - `errors` [string]\(default: '') : expected standard error. Can be a file.
- - `returncode` [integer]\(default: 0) : expected exit code.
+- `name` [string]\(default: `''`) : the test's name
+- `args` [array]\(default: `[]`) : the default program arguments
+- `input` [string]\(default: `''`) : the program standard input
+- `timeout` [int]\(default: `15`) : time given to the program to finish its execution
+- `emptyenv` [bool]\(default: `false`) : should the environment be emptied before executing the program
+- `env` [table]\(default: `{}`) : environment keys to be set. Overrides already defined keys.
+- `expected` [string|table]\(default: `''`) : table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
+ - `output` [string]\(default: `''`) : expected standard output. Can be a file.
+ - `errors` [string]\(default: `''`) : expected standard error. Can be a file.
+ - `returncode` [integer]\(default: `0`) : expected exit code.
 
 `input`, `expected.output` & `expected.errors` can be assigned a file contents by setting their value to the file path prefixed by `file:`.
 
