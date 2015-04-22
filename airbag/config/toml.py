@@ -37,13 +37,14 @@ def parse_test(raw, gconf):
 		if type(expected) is str:
 			expected = dict(output=expected)
 		test = Test(
-			get_key('program', raw, gconf, mandatory=True),
-			get_key('name', raw, gconf, default=''),
-			get_key('args', raw, gconf, default=[]),
-			expected
+			program = get_key('program', raw, gconf, mandatory=True),
+			name = get_key('name', raw, gconf, default=''),
+			arguments = get_key('args', raw, gconf, default=[]),
+			expected = expected,
+			stdin = get_key('input', raw, gconf),
+			timeout = get_key('timeout', raw, gconf, default=15)
 		)
 	except ValueError as e:
-		print('An error occured: {0}', e.strerror)
 		raise
 	else:
 		return test
@@ -54,9 +55,7 @@ def get_key(key, raw, gconf, mandatory=False, default=None):
 	elif key in gconf.keys():
 		return gconf[key]
 	else:
-		if mandatory == False and default == None:
-			return ''
-		elif mandatory == False and default != None:
+		if mandatory == False:
 			return default
 		else:
 			raise ValueError('Missing required key {0}'.format(key))
