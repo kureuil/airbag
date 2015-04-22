@@ -1,4 +1,5 @@
 import pytoml
+from sys import stderr
 from .base import BaseConfig
 from ..test import Test
 
@@ -7,19 +8,24 @@ class TomlConfig(BaseConfig):
 	def __init__(self, filepath):
 		super(TomlConfig, self).__init__()
 		self.filepath = filepath
-		self.parse()
+		try:
+			rawfile = open(filepath, 'r')
+		except FileNotFoundError:
+			stderr.write('Couldn\'t file airbag.toml file\n')
+			raise
+		else:
+			self.parse(rawfile)
 	
-	def parse(self):
-		with open(self.filepath, 'r') as rawfile:
-			raw = pytoml.load(rawfile)
-			gconf = parse_global(raw)
-			for rtest in raw['tests']:
-				try:
-					test = parse_test(rtest, gconf)
-				except ValueError:
-					return {}
-				else:
-					self.tests.append(test)
+	def parse(self, rawfile):
+		raw = pytoml.load(rawfile)
+		gconf = parse_global(raw)
+		for rtest in raw['tests']:
+			try:
+				test = parse_test(rtest, gconf)
+			except ValueError:
+				return {}
+			else:
+				self.tests.append(test)
 
 def parse_global(raw):
 	keys = ['program', 'project', 'args', 'expected']
