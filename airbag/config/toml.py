@@ -42,7 +42,9 @@ def parse_test(raw, gconf):
 			arguments = get_key('args', raw, gconf, default=[]),
 			expected = expected,
 			stdin = get_key('input', raw, gconf),
-			timeout = get_key('timeout', raw, gconf, default=15)
+			timeout = get_key('timeout', raw, gconf, default=15),
+			emptyenv = get_key('emptyenv', raw, gconf, default=False),
+			env = get_key('env', raw, gconf, default=None)
 		)
 	except ValueError as e:
 		raise

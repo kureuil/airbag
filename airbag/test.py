@@ -1,9 +1,10 @@
 from subprocess import Popen, PIPE, DEVNULL, TimeoutExpired
 from .status import ExitStatus
+from os import environ
 
 class Test(object):
 	"""docstring for Test"""
-	def __init__(self, program, name='', arguments=[], expected='', stdin=None, timeout=15):
+	def __init__(self, program, name='', arguments=[], expected='', stdin=None, timeout=15, emptyenv=False, env=None):
 		super(Test, self).__init__()
 		if program == '':
 			raise ValueError('Missing program path')
@@ -14,6 +15,13 @@ class Test(object):
 		self.assertions = True
 		self.input = stdin
 		self.timeout = timeout
+		if emptyenv is True:
+			self.env = env if env is not None else None
+		else:
+			self.env = environ.copy()
+			if env is not None:
+				for (k, v) in env:
+					self.env[k] = v
 
 	def run(self):
 		self.arguments.insert(0, self.program)
@@ -31,7 +39,7 @@ class Test(object):
 			else:
 				self.input = bytes(self.input, 'utf-8')
 		try:
-			p = Popen(self.arguments, stdin=stdin, stdout=stdout, stderr=stderr)
+			p = Popen(self.arguments, env=self.env, stdin=stdin, stdout=stdout, stderr=stderr)
 		except FileNotFoundError:
 			self.output('Couldn\'t find program {0}'.format(self.program))
 			return ExitStatus.noexec
