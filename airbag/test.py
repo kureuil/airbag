@@ -47,6 +47,7 @@ class Test(object):
 				return ExitStatus.timeout
 			else:
 				if p.returncode < 0:
+					self.output('Killed by signal {0}'.format(p.returncode * -1))
 					return ExitStatus.killed
 
 				if 'output' in self.expected.keys():
