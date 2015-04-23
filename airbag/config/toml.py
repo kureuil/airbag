@@ -11,7 +11,7 @@ class TomlConfig(BaseConfig):
 		try:
 			rawfile = open(filepath, 'r')
 		except FileNotFoundError:
-			stderr.write('Couldn\'t open {O}\n'.format(filepath))
+			stderr.write('Couldn\'t open {0}\n'.format(filepath))
 			raise
 		else:
 			self.parse(rawfile)
@@ -28,13 +28,10 @@ class TomlConfig(BaseConfig):
 				self.tests.append(test)
 
 def parse_global(raw):
-	keys = ['program', 'project', 'args', 'expected']
 	gconf = {}
-	if 'global' not in raw.keys():
-		return gconf
-	for key in keys:
-		if key in raw['global'].keys():
-			gconf[key] = raw['global'][key]
+	if 'global' in raw.keys():
+		for key, value in raw['global'].items():
+			gconf[key] = value
 	return gconf
 
 def parse_test(raw, gconf):
