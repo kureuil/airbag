@@ -27,6 +27,8 @@ optional arguments:
   -V, --version         Displays the current program\'s version and exit
 ```
 
+By default, DIR will be the current working directory and FILE will be `airbag.toml`.
+
 # Configuration
 
 Configuration is done inside the `airbag.toml` file, written in [Toml](http://github.com/toml-lang/toml).
