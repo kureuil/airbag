@@ -1,7 +1,7 @@
 from sys import exit, version_info, stderr
 
 if (version_info < (3, 3, 0)):
-	stderr.write('Python 3.3 is required to run this program')
+	stderr.write('Python 3.3+ is required to run this program')
 	exit(1)
 
 import argparse
