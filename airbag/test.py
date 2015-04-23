@@ -1,10 +1,10 @@
 from subprocess import Popen, PIPE, DEVNULL, TimeoutExpired
-from .status import ExitStatus
+from .status import ExitStatus, ProgramStatus
 from os import environ
 
 class Test(object):
 	"""docstring for Test"""
-	def __init__(self, program, name='', arguments=[], expected='', stdin=None, timeout=15, emptyenv=False, env=None):
+	def __init__(self, program, name='', arguments=[], expected=None, stdin=None, timeout=15, emptyenv=False, env=None, reference=None):
 		super(Test, self).__init__()
 		if program == '':
 			raise ValueError('Missing program path')
@@ -15,6 +15,7 @@ class Test(object):
 		self.assertions = True
 		self.input = stdin
 		self.timeout = timeout
+		self.reference = reference
 		if emptyenv is True:
 			self.env = env if env is not None else None
 		else:
@@ -46,53 +47,60 @@ class Test(object):
 		except PermissionError:
 			self.output('Couldn\'t execute program {0}'.format(self.program))
 			return ExitStatus.noexec
-		else:
-			try:
-				outs, errs = p.communicate(self.input, timeout=self.timeout)
-			except TimeoutExpired:
-				p.kill()
+
+		try:
+			outs, errs = p.communicate(self.input, timeout=self.timeout)
+		except TimeoutExpired:
+			p.kill()
+			if 'timeout' not in self.expected.keys() or self.expected['timeout'] == False:
 				self.output('Exceeding {0}s timeout'.format(self.timeout))
 				return ExitStatus.timeout
 			else:
-				if p.returncode < 0:
-					self.output('Killed by signal {0}'.format(p.returncode * -1))
-					return ExitStatus.killed
+				self.OK()
+				return ExitStatus.ok
 
-				if 'output' in self.expected.keys():
-					if self.expected['output'].startswith('file:'):
-						expected = open(self.expected['output'][5:], 'r').read()
-					else:
-						expected = self.expected['output']
-					if outs is not None and outs.decode('utf-8') != expected:
-						self.KO()
-						print('\tStandard output differ')
-						print('\tExpected:\n{0}'.format(expected))
-						print('\tOutput:\n{0}'.format(outs.decode("utf-8")))
+		status = ProgramStatus(outs, errs, p)
+		if self.reference is not None and len(self.expected) is 0:
+			pass
+		if p.returncode < 0:
+			self.output('Killed by signal {0}'.format(p.returncode * -1))
+			return ExitStatus.killed
 
-				if 'errors' in self.expected.keys():
-					if self.expected['errors'].startswith('file:'):
-						expected = open(self.expected['errors'][5:], 'r').read()
-					else:
-						expected = self.expected['errors']
-					if errs.decode('utf-8') != expected:
-						self.KO()
-						print('\tStandard error differ')
-						print('\tExpected:\n{0}'.format(expected))
-						print('\tOutput:\n{0}'.format(errs.decode('utf-8')))
+		if 'output' in self.expected.keys():
+			if self.expected['output'].startswith('file:'):
+				expected = open(self.expected['output'][5:], 'r').read()
+			else:
+				expected = self.expected['output']
+			if outs is not None and outs.decode('utf-8') != expected:
+				self.KO()
+				print('\tStandard output differ')
+				print('\tExpected:\n{0}'.format(expected))
+				print('\tOutput:\n{0}'.format(outs.decode("utf-8")))
 
-				if 'returncode' in self.expected.keys():
-					if self.expected['returncode'] != p.returncode:
-						self.KO()
-						print('\tReturn codes differ')
-						print('\tExpected: {0}'.format(self.expected['returncode']))
-						print('\tReturned: {0}'.format(p.returncode))
+		if 'errors' in self.expected.keys():
+			if self.expected['errors'].startswith('file:'):
+				expected = open(self.expected['errors'][5:], 'r').read()
+			else:
+				expected = self.expected['errors']
+			if errs.decode('utf-8') != expected:
+				self.KO()
+				print('\tStandard error differ')
+				print('\tExpected:\n{0}'.format(expected))
+				print('\tOutput:\n{0}'.format(errs.decode('utf-8')))
 
-				if self.assertions == True:
-					self.OK()
-					return ExitStatus.ok
-				else:
-					self.KO()
-					return ExitStatus.finished
+		if 'returncode' in self.expected.keys():
+			if self.expected['returncode'] != p.returncode:
+				self.KO()
+				print('\tReturn codes differ')
+				print('\tExpected: {0}'.format(self.expected['returncode']))
+				print('\tReturned: {0}'.format(p.returncode))
+
+		if self.assertions == True:
+			self.OK()
+			return ExitStatus.ok
+		else:
+			self.KO()
+			return ExitStatus.finished
 
 	def OK(self):
 		self.output('OK')
