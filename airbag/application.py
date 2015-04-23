@@ -5,8 +5,8 @@ if (version_info < (3, 3, 0)):
 	exit(1)
 
 import argparse
-from .error import write as writerr
 from os import getcwd, chdir, path
+from .error import write as writerr
 from .testrunner import TestRunner
 from .config.toml import TomlConfig
 
