@@ -11,7 +11,7 @@ class TomlConfig(BaseConfig):
 		try:
 			rawfile = open(filepath, 'r')
 		except FileNotFoundError:
-			stderr.write('Couldn\'t file airbag.toml file\n')
+			stderr.write('Couldn\'t parse airbag.toml\n')
 			raise
 		else:
 			self.parse(rawfile)
