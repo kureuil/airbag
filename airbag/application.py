@@ -5,7 +5,8 @@ if (version_info < (3, 3, 0)):
 	exit(1)
 
 import argparse
-from os import getcwd, chdir
+from .error import write as writerr
+from os import getcwd, chdir, path
 from .testrunner import TestRunner
 from .config.toml import TomlConfig
 
@@ -22,7 +23,7 @@ def cli():
 	)
 	parser.add_argument(
 		'-f', '--input-file',
-		type=str,
+		type=argparse.FileType('r'),
 		metavar='FILE',
 		default='airbag.toml',
 		help='Changes the configuration used'
@@ -37,12 +38,15 @@ def cli():
 	try:
 		config = TomlConfig(args.input_file)
 	except ValueError:
-		stderr.write('Error during configuration file parsing.\n')
-		exit(1)
-	except FileNotFoundError:
+		writerr('{0}: error during parsing'.format(args.input_file.name))
 		exit(1)
 	else:
-		chdir(args.working_dir)
+		if args.working_dir is not None:
+			if path.exists(args.working_dir):
+				chdir(args.working_dir)
+			else:
+				writerr('{0}: directory does not exist'.format(args.working_dir))
+				exit(1)
 		runner = TestRunner(config)
 		if runner.launch() != 0:
 			exit(1)

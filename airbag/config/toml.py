@@ -5,25 +5,16 @@ from ..test import Test
 
 class TomlConfig(BaseConfig):
 	"""docstring for TomlConfig"""
-	def __init__(self, filepath):
+	def __init__(self, contents):
 		super(TomlConfig, self).__init__()
-		self.filepath = filepath
-		try:
-			rawfile = open(filepath, 'r')
-		except FileNotFoundError:
-			stderr.write('Couldn\'t open {0}\n'.format(filepath))
-			raise
-		else:
-			self.parse(rawfile)
-	
-	def parse(self, rawfile):
-		raw = pytoml.load(rawfile)
+		raw = pytoml.load(contents)
 		gconf = parse_global(raw)
+		self.tests = []
 		for rtest in raw['tests']:
 			try:
 				test = parse_test(rtest, gconf)
 			except ValueError:
-				return {}
+				raise
 			else:
 				self.tests.append(test)
 
@@ -47,7 +38,8 @@ def parse_test(raw, gconf):
 			stdin=get_key('input', raw, gconf),
 			timeout=get_key('timeout', raw, gconf, default=15),
 			emptyenv=get_key('emptyenv', raw, gconf, default=False),
-			env=get_key('env', raw, gconf, default=None)
+			env=get_key('env', raw, gconf),
+			reference=get_key('ref', raw, gconf)
 		)
 	except ValueError as e:
 		raise
