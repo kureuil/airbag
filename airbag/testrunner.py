@@ -4,9 +4,9 @@ from .status import ExitStatus
 
 class TestRunner(object):
     """docstring for TestRunner"""
-    def __init__(self, config):
+    def __init__(self, tests):
         super(TestRunner, self).__init__()
-        self.tests = config.tests
+        self.tests = tests
 
     def launch(self):
         starttime = time()

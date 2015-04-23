@@ -1,10 +1,11 @@
 try:
     from sys import exit, version_info, stderr
     import argparse
+    import pkg_resources
     from os import getcwd, chdir, path
     from .error import write as writerr
     from .testrunner import TestRunner
-    from .config.toml import TomlConfig
+    from .test import Test
 except:
     if (version_info < (3, 3, 0)):
         stderr.write('Python 3.3+ is required to run this program')
@@ -36,8 +37,20 @@ def cli():
         help='Displays the current program\'s version and exit'
     )
     args = parser.parse_args()
+    parsers = dict()
+    for v in pkg_resources.iter_entry_points(group='airbag.parsers'):
+        v = v.load()
+        if v.get_extension() in parsers.keys():
+            writerr(
+                '{0}: duplicate parsers for this file type'.format(
+                    v.get_extension()
+                )
+            )
+        else:
+            parsers[v.get_extension()] = v
     try:
-        config = TomlConfig(args.input_file)
+        filename, fileext = path.splitext(args.input_file.name)
+        config = parsers[fileext[1:]](args.input_file)
     except ValueError:
         writerr('{0}: error during parsing'.format(args.input_file.name))
         exit(1)
@@ -50,6 +63,10 @@ def cli():
                     '{0}: directory does not exist'.format(args.working_dir)
                 )
                 exit(1)
-        runner = TestRunner(config)
+        tests = []
+        rtests = config.parse()
+        for rtest in rtests:
+            tests.append(Test(**rtest))
+        runner = TestRunner(tests)
         if runner.launch() != 0:
             exit(1)
