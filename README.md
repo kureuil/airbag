@@ -47,6 +47,7 @@ There's a table named `global` and a table array named `tests`. The `global` tab
  - `output` [string]\(default: `''`): expected standard output. Can be a file.
  - `errors` [string]\(default: `''`): expected standard error. Can be a file.
  - `returncode` [integer]\(default: `0`): expected exit code.
+ - `timeout` [bool]\(default: `false`): should the program timeout?
 
 `input`, `expected.output` & `expected.errors` can be assigned a file contents by setting their value to the file path prefixed by `file:`.
 
