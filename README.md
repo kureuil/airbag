@@ -7,7 +7,7 @@ Simple testrunner written in Python.
 Clone this repo and run in a terminal:
 
 ```bash
-# python3 setup.py install
+$ sudo python3 setup.py install
 ```
 
 # Usage
