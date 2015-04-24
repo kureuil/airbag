@@ -32,7 +32,7 @@ def cli():
     parser.add_argument(
         '-V', '--version',
         action='version',
-        version='Airbag 0.2',
+        version='Airbag 0.3',
         help='Displays the current program\'s version and exit'
     )
     args = parser.parse_args()
