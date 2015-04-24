@@ -17,7 +17,7 @@ class ProgramTest(object):
         env=None,
         reference=None
     ):
-        super(ProgramsTest, self).__init__()
+        super(ProgramTest, self).__init__()
         if program == '':
             raise ValueError('Missing program path')
         self.program = program
