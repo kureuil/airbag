@@ -35,8 +35,9 @@ Configuration is done inside the `airbag.toml` file, written in [Toml](http://gi
 
 There's a table named `global` and a table array named `tests`. The `global` table properties' are scoped to all the tests. For each test you can define :
 
+- `type` [string]\(**mandatory**): the test runner type
 - `project` [string]\(default: `''`): the project name
-- `program` [string]\(mandatory): the default program to be run
+- `program` [string]\(**mandatory**): the default program to be run
 - `name` [string]\(default: `''`): the test's name
 - `args` [array]\(default: `[]`): the default program arguments
 - `input` [string]\(default: `''`): the program standard input
@@ -51,6 +52,22 @@ There's a table named `global` and a table array named `tests`. The `global` tab
 
 `input`, `expected.output` & `expected.errors` can be assigned a file contents by setting their value to the file path prefixed by `file:`.
 
+## Configuration parsers
+
+Configuration parsers in airbag are totally configurable. Anyone can write their own configuration parsers.
+
+To register a configuration parser, register a class on the `airbag.parsers` entry point. TODO: document this feature, meanwhile see [toml.py](https://github.com/kureuil/airbag/blob/master/airbag_toml/toml.py).
+
+For practical reasons, airbag ships with a toml configuration parsers.
+
+## Test runners
+
+As for configuration parsers, test runners are totally configurable.
+
+To register a test runner, register a class on the `airbag.runners` entry point. TODO: document this feature, meanwhile see [runner.py](https://github.com/kureuil/airbag/blob/master/airbag_program/runner.py).
+
+For practical reasons, airbag ships with a program test runner, which you can see an example below.
+
 # Example
 
 ```toml
@@ -59,6 +76,7 @@ There's a table named `global` and a table array named `tests`. The `global` tab
 project = "Dummy project"
 program = "foo"
 args = []
+type = "program"
 
 [[tests]]
 name = "It should work with invalid parameters"
