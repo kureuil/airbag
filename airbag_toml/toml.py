@@ -7,7 +7,6 @@ class TomlConfig(object):
         super(TomlConfig, self).__init__()
         self.raw = pytoml.load(contents)
 
-
     def parse(self):
         tests = []
         gconf = {}
@@ -21,7 +20,6 @@ class TomlConfig(object):
                 raise
             tests.append(test)
         return tests
-
 
     def get_extension():
         return 'toml'
