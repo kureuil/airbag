@@ -1,9 +1,9 @@
 from subprocess import Popen, PIPE, DEVNULL, TimeoutExpired
-from .status import ExitStatus, ProgramStatus
+from airbag.status import ExitStatus
 from os import environ
 
 
-class Test(object):
+class ProgramTest(object):
     """docstring for Test"""
     def __init__(
         self,
@@ -17,7 +17,7 @@ class Test(object):
         env=None,
         reference=None
     ):
-        super(Test, self).__init__()
+        super(ProgramsTest, self).__init__()
         if program == '':
             raise ValueError('Missing program path')
         self.program = program
@@ -77,7 +77,6 @@ class Test(object):
             self.OK()
             return ExitStatus.ok
 
-        status = ProgramStatus(outs, errs, p)
         if self.reference is not None and len(self.expected) is 0:
             pass
         if p.returncode < 0:
@@ -130,3 +129,6 @@ class Test(object):
 
     def output(self, message):
         print('[{0}]{1}: {2}'.format(self.program, self.name, message))
+
+    def get_type():
+        return 'program'

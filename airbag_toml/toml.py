@@ -41,7 +41,8 @@ def parse_test(raw, gconf):
             timeout=get_key('timeout', raw, gconf, default=15),
             emptyenv=get_key('emptyenv', raw, gconf, default=False),
             env=get_key('env', raw, gconf),
-            reference=get_key('ref', raw, gconf)
+            reference=get_key('ref', raw, gconf),
+            type=get_key('type', raw, gconf)
         )
     except ValueError as e:
         raise
