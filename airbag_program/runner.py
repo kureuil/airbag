@@ -33,7 +33,7 @@ class ProgramTest(object):
         else:
             self.env = environ.copy()
             if env is not None:
-                for (k, v) in env:
+                for (k, v) in env.items():
                     self.env[k] = v
 
     def run(self):
