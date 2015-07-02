@@ -20,7 +20,7 @@ setup(
         [airbag.runners]
         prgm=airbag_program.runner:ProgramTest
     ''',
-    install_requires=[
-        'pytoml>=0.1.2'
-    ]
+    extras_require={
+        'toml': ['pytoml>=0.1.2']
+    }
 )
