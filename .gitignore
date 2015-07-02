@@ -7,3 +7,4 @@ dist
 *.toml
 *.egg
 airbag.egg-info/
+*.swp
