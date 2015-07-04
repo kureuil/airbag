@@ -28,7 +28,7 @@ class TomlConfig(object):
 def parse_test(raw, gconf):
     try:
         expected = get_key('expected', raw, gconf, default='')
-        if type(expected) is str:
+        if isinstance(expected, str):
             expected = dict(output=expected)
         test = dict(
             program=get_key('program', raw, gconf, mandatory=True),
