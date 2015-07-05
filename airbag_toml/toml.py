@@ -10,7 +10,7 @@ class TomlConfig(object):
     def parse(self):
         tests = []
         gconf = {}
-        if 'global' in self.raw.keys():
+        if 'global' in self.raw:
             for key, value in self.raw['global'].items():
                 gconf[key] = value
         for rtest in self.raw['tests']:
@@ -48,9 +48,9 @@ def parse_test(raw, gconf):
 
 
 def get_key(key, raw, gconf, mandatory=False, default=None):
-    if key in raw.keys():
+    if key in raw:
         return raw[key]
-    elif key in gconf.keys():
+    elif key in gconf:
         return gconf[key]
     else:
         if mandatory is False:

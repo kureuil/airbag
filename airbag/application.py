@@ -42,7 +42,7 @@ def get_parsers():
     parsers = dict()
     for v in pkg_resources.iter_entry_points(group='airbag.parsers'):
         v = v.load()
-        if v.get_extension() in parsers.keys():
+        if v.get_extension() in parsers:
             writerr(
                 '{0}: duplicate parsers for this file type'.format(
                     v.get_extension()
@@ -60,7 +60,7 @@ def get_runners():
     runners = dict()
     for v in pkg_resources.iter_entry_points(group='airbag.runners'):
         v = v.load()
-        if v.get_type() in runners.keys():
+        if v.get_type() in runners:
             writerr(
                 '{0}: duplicate runners for this test type'.format(
                     v.get_type()
@@ -99,7 +99,7 @@ def get_tests(config, runners):
     tests = []
     rtests = config.parse()
     for rtest in rtests:
-        if 'type' in rtest.keys() and rtest['type'] is not None:
+        if 'type' in rtest and rtest['type'] is not None:
             try:
                 runner = runners[rtest['type']]
                 del rtest['type']
@@ -114,7 +114,7 @@ def get_tests(config, runners):
         else:
             writerr(
                 'no type defined for test \'{0}\''.format(
-                    rtest['name'] if 'name' in rtest.keys() else '[unknown]'
+                    rtest['name'] if 'name' in rtest else '[unknown]'
                 )
             )
     return tests

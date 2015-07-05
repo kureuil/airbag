@@ -39,10 +39,10 @@ class ProgramTest(object):
     def run(self):
         self.arguments.insert(0, self.program)
         stdout = DEVNULL
-        if 'output' in self.expected.keys() and len(self.expected['output']):
+        if 'output' in self.expected and len(self.expected['output']):
             stdout = PIPE
         stderr = DEVNULL
-        if 'errors' in self.expected.keys() and len(self.expected['errors']):
+        if 'errors' in self.expected and len(self.expected['errors']):
             stderr = PIPE
         stdin = None
         if self.input is not None:
@@ -70,7 +70,7 @@ class ProgramTest(object):
             outs, errs = p.communicate(self.input, timeout=self.timeout)
         except TimeoutExpired:
             p.kill()
-            if 'timeout' not in self.expected.keys():
+            if 'timeout' not in self.expected:
                 if self.expected['timeout'] is not True:
                     self.output('Exceeding {0}s timeout'.format(self.timeout))
                     return ExitStatus.timeout
@@ -83,7 +83,7 @@ class ProgramTest(object):
             self.output('Killed by signal {0}'.format(p.returncode * -1))
             return ExitStatus.killed
 
-        if 'output' in self.expected.keys():
+        if 'output' in self.expected:
             if self.expected['output'].startswith('file:'):
                 expected = open(self.expected['output'][5:], 'r').read()
             else:
@@ -94,7 +94,7 @@ class ProgramTest(object):
                 print('\tExpected:\n{0}'.format(expected))
                 print('\tOutput:\n{0}'.format(outs.decode("utf-8")))
 
-        if 'errors' in self.expected.keys():
+        if 'errors' in self.expected:
             if self.expected['errors'].startswith('file:'):
                 expected = open(self.expected['errors'][5:], 'r').read()
             else:
@@ -105,7 +105,7 @@ class ProgramTest(object):
                 print('\tExpected:\n{0}'.format(expected))
                 print('\tOutput:\n{0}'.format(errs.decode('utf-8')))
 
-        if 'returncode' in self.expected.keys():
+        if 'returncode' in self.expected:
             if self.expected['returncode'] != p.returncode:
                 self.KO()
                 print('\tReturn codes differ')
