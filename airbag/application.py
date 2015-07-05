@@ -11,7 +11,7 @@ except:
         exit(1)
 
 
-def cli():
+def cli_parse_args():
     parser = argparse.ArgumentParser(
         description='Runs functional tests on your programs'
     )
@@ -35,8 +35,10 @@ def cli():
         version='Airbag 0.3',
         help='Displays the current program\'s version and exit'
     )
-    args = parser.parse_args()
+    return parser.parse_args() 
 
+
+def get_parsers():
     parsers = dict()
     for v in pkg_resources.iter_entry_points(group='airbag.parsers'):
         v = v.load()
@@ -48,10 +50,13 @@ def cli():
             )
         else:
             parsers[v.get_extension()] = v
-    if len(parsers) is 0:
+    if not parsers:
         writerr('no config parsers available. Aborting...')
         exit(1)
+    return parsers
 
+
+def get_runners():
     runners = dict()
     for v in pkg_resources.iter_entry_points(group='airbag.runners'):
         v = v.load()
@@ -63,26 +68,34 @@ def cli():
             )
         else:
             runners[v.get_type()] = v
-    if len(runners) is 0:
+    if not runners:
         writerr('no test runners available. Aborting...')
-        exit(1)
+        exit(1) 
+    return runners
 
+
+def get_config(input_file, parsers):
     try:
-        filename, fileext = path.splitext(args.input_file.name)
-        config = parsers[fileext[1:]](args.input_file)
+        filename, fileext = path.splitext(input_file.name)
+        config = parsers[fileext[1:]](input_file)
     except ValueError:
-        writerr('{0}: error during parsing'.format(args.input_file.name))
+        writerr('{0}: error during parsing'.format(input_file.name))
         exit(1)
+    return config
 
-    if args.working_dir is not None:
-        if path.exists(args.working_dir):
-            chdir(args.working_dir)
+
+def change_working_dir(directory=None):
+    if directory is not None:
+        if path.exists(directory):
+            chdir(directory)
         else:
             writerr(
-                '{0}: directory does not exist'.format(args.working_dir)
+                '{0}: directory does not exist'.format(directory)
             )
             exit(1)
 
+
+def get_tests(config, runners):
     tests = []
     rtests = config.parse()
     for rtest in rtests:
@@ -104,6 +117,16 @@ def cli():
                     rtest['name'] if 'name' in rtest.keys() else '[unknown]'
                 )
             )
+    return tests
+
+
+def cli():
+    args = cli_parse_args()
+    parsers = get_parsers()
+    runners = get_runners()
+    config = get_config(args.input_file, parsers)
+    change_working_dir(args.working_dir)
+    tests = get_tests(config, runners)
     testrunner = TestRunner(tests)
     if testrunner.launch() != 0:
         exit(1)
