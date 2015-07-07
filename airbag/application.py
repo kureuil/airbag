@@ -30,6 +30,13 @@ def cli_parse_args():
         help='Changes the configuration used'
     )
     parser.add_argument(
+        '-F', '--formatter',
+        type=str,
+        metavar='FORMATTER',
+        default='cli',
+        help='Formatter used to display the output. Default is `cli`'
+    )
+    parser.add_argument(
         '-V', '--version',
         action='version',
         version='Airbag 0.3',
@@ -72,6 +79,14 @@ def get_runners():
         writerr('no test runners available. Aborting...')
         exit(1) 
     return runners
+
+
+def get_formatter(formatter):
+    for v in pkg_resources.iter_entry_points(group='airbag.formatters'):
+        v = v.load()
+        if formatter == v.get_type():
+            return v()
+    raise ValueError("No formatter named {} found".format(formatter))
 
 
 def get_config(input_file, parsers):
@@ -124,9 +139,10 @@ def cli():
     args = cli_parse_args()
     parsers = get_parsers()
     runners = get_runners()
+    formatter = get_formatter(args.formatter)
     config = get_config(args.input_file, parsers)
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)
-    testrunner = TestRunner(tests)
+    testrunner = TestRunner(tests, formatter)
     if testrunner.launch() != 0:
         exit(1)

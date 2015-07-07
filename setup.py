@@ -19,6 +19,8 @@ setup(
         toml=airbag_toml.toml:TomlConfig [toml]
         [airbag.runners]
         prgm=airbag_program.runner:ProgramTest
+        [airbag.formatters]
+        cli=airbag_cli.cli:CliFormatter
     ''',
     extras_require={
         'toml': ['pytoml>=0.1.2']
