@@ -5,6 +5,7 @@ try:
     from os import getcwd, chdir, path
     from .error import write as writerr
     from .testrunner import TestRunner
+    from .messagebag import MessageBag
 except:
     if (version_info < (3, 3, 0)):
         stderr.write('Python 3.3+ is required to run this program')
@@ -37,12 +38,20 @@ def cli_parse_args():
         help='Formatter used to display the output. Default is `cli`'
     )
     parser.add_argument(
+        '-O', '--out-fmt',
+        type=str,
+        metavar='OUTPUTS',
+        default=[],
+        nargs='*',
+        help='Additional formatters to use with their file destination'
+    )
+    parser.add_argument(
         '-V', '--version',
         action='version',
         version='Airbag 0.3',
         help='Displays the current program\'s version and exit'
     )
-    return parser.parse_args() 
+    return parser.parse_args()
 
 
 def get_parsers():
@@ -77,15 +86,19 @@ def get_runners():
             runners[v.get_type()] = v
     if not runners:
         writerr('no test runners available. Aborting...')
-        exit(1) 
+        exit(1)
     return runners
 
 
-def get_formatter(formatter):
+def get_message_bag():
+    return MessageBag()
+
+
+def get_formatter(formatter, message_bag):
     for v in pkg_resources.iter_entry_points(group='airbag.formatters'):
         v = v.load()
         if formatter == v.get_type():
-            return v()
+            return v(message_bag)
     raise ValueError("No formatter named {} found".format(formatter))
 
 
@@ -139,7 +152,8 @@ def cli():
     args = cli_parse_args()
     parsers = get_parsers()
     runners = get_runners()
-    formatter = get_formatter(args.formatter)
+    message_bag = get_message_bag()
+    formatter = get_formatter(args.formatter, message_bag)
     config = get_config(args.input_file, parsers)
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)

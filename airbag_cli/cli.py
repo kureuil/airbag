@@ -1,6 +1,10 @@
+from airbag.status import ExitStatus
+
+
 class CliFormatter(object):
-    def __init__(self):
+    def __init__(self, message_bag):
         super(CliFormatter, self).__init__()
+        self.message_bag = message_bag
 
     def batch(self, tests_results, tests_stats):
         self.started(tests_stats)
@@ -9,10 +13,22 @@ class CliFormatter(object):
         self.ended(tests_results, tests_stats)
 
     def started(self, tests_stats):
-        print(tests_stats)
+        pass
 
     def ran(self, test_result, tests_stats):
-        print(test_result)
+        state = self.message_bag.get_status_str(test_result.status)
+        print('[{0}]{1}: {2}'.format(
+            test_result.program,
+            test_result.name,
+            state
+        ))
+        if test_result.status == ExitStatus.finished:
+            for error in test_result.errors:
+                print(
+                    self.message_bag
+                        .get_error_str(error['type'])
+                        .format(*(error['args']))
+                )
 
     def ended(self, tests_results, tests_stats):
         print(
@@ -31,4 +47,3 @@ class CliFormatter(object):
 
     def get_type():
         return 'cli'
-
