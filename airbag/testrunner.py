@@ -4,42 +4,46 @@ from .status import ExitStatus
 
 class TestRunner(object):
     """docstring for TestRunner"""
-    def __init__(self, tests):
+    def __init__(self, tests, formatters):
         super(TestRunner, self).__init__()
         self.tests = tests
+        self.formatters = formatters
+        self.tests_results = []
+        self.stats = dict(successes=0,
+                          failures=0,
+                          errors=0,
+                          percentage=0,
+                          tests=len(tests)
+                          )
 
     def launch(self):
-        starttime = time()
-        failures = 0
-        errors = 0
+        self.stats['starttime'] = time()
+        for formatter in self.formatters:
+            formatter.started(self.stats)
+        self.run_tests()
+        self.stats['endtime'] = time()
+        self.stats['elapsed'] = self.stats['endtime'] - self.stats['starttime']
+        self.stats['success'] = self.stats['tests'] - (self.stats['failures'] +
+                                                       self.stats['errors'])
+        if self.stats['tests'] > 0:
+            ratio = self.stats['success'] / self.stats['tests']
+            self.stats['percentage'] = ratio * 100
+        for formatter in self.formatters:
+            formatter.ended(self.tests_results, self.stats)
+        return self.stats['failures']
+
+    def run_tests(self):
         for test in self.tests:
-            status = test.run()
-            if status is ExitStatus.ok:
+            result = test.run()
+            for formatter in self.formatters:
+                formatter.ran(result, self.stats)
+            if result.status is ExitStatus.OK:
                 continue
-            elif status in (
+            elif result.status in (
                 ExitStatus.killed,
                 ExitStatus.timeout,
                 ExitStatus.noexec
             ):
-                failures += 1
+                self.stats['failures'] += 1
             else:
-                errors += 1
-        tests = len(self.tests)
-        success = len(self.tests) - (failures + errors)
-        percentage = 0
-        if tests > 0:
-            percentage = success / tests * 100
-        print(
-            'Ran {0} tests in {1:.1f} seconds.'.format(
-                tests, time() - starttime
-            )
-        )
-        print(
-            '[{0:.0f}%] Success: {1} | Errors: {3} | Failures: {2}'.format(
-                percentage,
-                success,
-                failures,
-                errors
-            )
-        )
-        return failures
+                self.stats['errors'] += 1

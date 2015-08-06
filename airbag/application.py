@@ -1,10 +1,11 @@
 try:
-    from sys import exit, version_info, stderr
+    from sys import exit, version_info, stdout, stderr
     import argparse
     import pkg_resources
     from os import getcwd, chdir, path
     from .error import write as writerr
     from .testrunner import TestRunner
+    from .messagebag import MessageBag
 except:
     if (version_info < (3, 3, 0)):
         stderr.write('Python 3.3+ is required to run this program')
@@ -30,12 +31,27 @@ def cli_parse_args():
         help='Changes the configuration used'
     )
     parser.add_argument(
+        '-F', '--formatter',
+        type=str,
+        metavar='FORMATTER',
+        default='cli',
+        help='Formatter used to display the output. Default is `cli`'
+    )
+    parser.add_argument(
+        '-O', '--out-fmt',
+        type=str,
+        metavar='OUTPUTS',
+        default=[],
+        nargs='*',
+        help='Additional formatters to use with their file destination'
+    )
+    parser.add_argument(
         '-V', '--version',
         action='version',
         version='Airbag 0.3',
         help='Displays the current program\'s version and exit'
     )
-    return parser.parse_args() 
+    return parser.parse_args()
 
 
 def get_parsers():
@@ -70,8 +86,36 @@ def get_runners():
             runners[v.get_type()] = v
     if not runners:
         writerr('no test runners available. Aborting...')
-        exit(1) 
+        exit(1)
     return runners
+
+
+def get_message_bag():
+    return MessageBag()
+
+
+def get_formatter(formatter, message_bag, stream):
+    for v in pkg_resources.iter_entry_points(group='airbag.formatters'):
+        v = v.load()
+        if formatter == v.get_type():
+            return v(message_bag, stream)
+    raise ValueError("No formatter named {} found".format(formatter))
+
+
+def get_outputs(outputs, message_bag):
+    formatters = []
+    for output in outputs:
+        try:
+            [formatter_name, outfile] = output.split(':', maxsplit=1)
+            stream = open(outfile, 'w+')
+            formatters.append(
+                get_formatter(formatter_name, message_bag, stream)
+            ) 
+        except ValueError as e:
+            writerr('Error in formatter `{}`: {}'.format(output, e)) 
+        except OSError as e:
+            writerr('Couldn\'t open file `{}`: {}'.format(outfile, e))
+    return formatters
 
 
 def get_config(input_file, parsers):
@@ -97,6 +141,7 @@ def change_working_dir(directory=None):
 
 def get_tests(config, runners):
     tests = []
+    
     rtests = config.parse()
     for rtest in rtests:
         if 'type' in rtest and rtest['type'] is not None:
@@ -124,9 +169,15 @@ def cli():
     args = cli_parse_args()
     parsers = get_parsers()
     runners = get_runners()
+    message_bag = get_message_bag()
+    formatter = get_formatter(args.formatter, message_bag, stdout)
+    outputs = get_outputs(args.out_fmt, message_bag)
+    outputs.append(formatter)
     config = get_config(args.input_file, parsers)
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)
-    testrunner = TestRunner(tests)
+    testrunner = TestRunner(tests, outputs)
     if testrunner.launch() != 0:
         exit(1)
+    for formatter in outputs:
+        formatter.stream.close()

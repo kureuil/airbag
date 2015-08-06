@@ -1,5 +1,6 @@
 from subprocess import Popen, PIPE, DEVNULL, TimeoutExpired
 from airbag.status import ExitStatus
+from airbag.result import TestResult, ErrorType
 from os import environ
 
 
@@ -20,11 +21,12 @@ class ProgramTest(object):
         super(ProgramTest, self).__init__()
         if program == '':
             raise ValueError('Missing program path')
+        self.result = TestResult(name, program=program, arguments=arguments)
         self.program = program
         self.name = name
         self.arguments = arguments
+        self.arguments.insert(0, self.program)
         self.expected = expected
-        self.assertions = True
         self.input = stdin
         self.timeout = timeout
         self.reference = reference
@@ -37,7 +39,6 @@ class ProgramTest(object):
                     self.env[k] = v
 
     def run(self):
-        self.arguments.insert(0, self.program)
         stdout = DEVNULL
         if 'output' in self.expected and len(self.expected['output']):
             stdout = PIPE
@@ -60,28 +61,33 @@ class ProgramTest(object):
                 stderr=stderr
             )
         except FileNotFoundError:
-            self.output('Couldn\'t find program {0}'.format(self.program))
-            return ExitStatus.noexec
+            self.result.add_error(
+                ErrorType.FILE_NOT_FOUND,
+                program=self.program
+            ).set_exit_status(ExitStatus.noexec)
+            return self.result
         except PermissionError:
-            self.output('Couldn\'t execute program {0}'.format(self.program))
-            return ExitStatus.noexec
+            self.result.add_error(ErrorType.NO_RIGHTS, self.program)
+            self.result.set_exit_status(ExitStatus.noexec)
+            return self.result
 
         try:
-            outs, errs = p.communicate(self.input, timeout=self.timeout)
+            outs, errs = p.communicate(self.input, self.timeout)
         except TimeoutExpired:
             p.kill()
             if 'timeout' not in self.expected:
                 if self.expected['timeout'] is not True:
-                    self.output('Exceeding {0}s timeout'.format(self.timeout))
-                    return ExitStatus.timeout
-            self.OK()
-            return ExitStatus.ok
+                    self.result.add_error(
+                        ErrorType.TIMEOUT,
+                        self.timeout
+                    ).set_exit_status(ExitStatus.timeout)
+                    return self.result
+            return self.result
 
-        if self.reference is not None and len(self.expected) is 0:
-            pass
         if p.returncode < 0:
-            self.output('Killed by signal {0}'.format(p.returncode * -1))
-            return ExitStatus.killed
+            self.result.add_error(ErrorType.SIGNALED, -p.returncode)
+            self.result.set_exit_status(ExitStatus.killed)
+            return self.result
 
         if 'output' in self.expected:
             if self.expected['output'].startswith('file:'):
@@ -89,10 +95,11 @@ class ProgramTest(object):
             else:
                 expected = self.expected['output']
             if outs is not None and outs.decode('utf-8') != expected:
-                self.KO()
-                print('\tStandard output differ')
-                print('\tExpected:\n{0}'.format(expected))
-                print('\tOutput:\n{0}'.format(outs.decode("utf-8")))
+                self.result.add_error(
+                    ErrorType.STDOUT_DIFFERS,
+                    expected,
+                    outs.decode('utf-8')
+                )
 
         if 'errors' in self.expected:
             if self.expected['errors'].startswith('file:'):
@@ -100,35 +107,23 @@ class ProgramTest(object):
             else:
                 expected = self.expected['errors']
             if errs.decode('utf-8') != expected:
-                self.KO()
-                print('\tStandard error differ')
-                print('\tExpected:\n{0}'.format(expected))
-                print('\tOutput:\n{0}'.format(errs.decode('utf-8')))
+                self.result.add_error(
+                    ErrorType.STDERR_DIFFERS,
+                    expected,
+                    errs.decode('utf-8')
+                )
 
         if 'returncode' in self.expected:
             if self.expected['returncode'] != p.returncode:
-                self.KO()
-                print('\tReturn codes differ')
-                print('\tExpected: {0}'.format(self.expected['returncode']))
-                print('\tReturned: {0}'.format(p.returncode))
+                self.result.add_error(
+                    ErrorType.RETURN_CODE_DIFFERS,
+                    self.expected['returncode'],
+                    p.returncode
+                )
 
-        if self.assertions is True:
-            self.OK()
-            return ExitStatus.ok
-        else:
-            self.KO()
-            return ExitStatus.finished
-
-    def OK(self):
-        self.output('OK')
-
-    def KO(self):
-        if self.assertions is True:
-            self.assertions = False
-            self.output('KO')
-
-    def output(self, message):
-        print('[{0}]{1}: {2}'.format(self.program, self.name, message))
+        if len(self.result.errors):
+            self.result.set_exit_status(ExitStatus.finished)
+        return self.result
 
     def get_type():
         return 'program'
