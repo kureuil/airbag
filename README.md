@@ -13,8 +13,8 @@ $ sudo python3 setup.py install
 # Usage
 
 ```bash
-$ testrunner -h
-usage: testrunner [-h] [-d DIR] [-f FILE] [-V]
+$ airbag -h
+usage: airbag [-h] [-d DIR] [-f FILE] [-V]
 
 Runs functional tests on your programs
 

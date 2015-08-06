@@ -14,7 +14,7 @@ setup(
     packages=find_packages(),
     entry_points='''
         [console_scripts]
-        testrunner=airbag.application:cli
+        airbag=airbag.application:cli
         [airbag.parsers]
         toml=airbag_toml.toml:TomlConfig [toml]
         [airbag.runners]
