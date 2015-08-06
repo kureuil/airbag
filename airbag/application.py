@@ -141,7 +141,6 @@ def change_working_dir(directory=None):
 
 def get_tests(config, runners):
     tests = []
-    
     rtests = config.parse()
     for rtest in rtests:
         if 'type' in rtest and rtest['type'] is not None:
@@ -156,6 +155,10 @@ def get_tests(config, runners):
                 )
                 exit(1)
             tests.append(runner(**rtest))
+        elif rtest['type'] is None and len(runners) == 1:
+            default_runner = list(runners.values())[0]
+            del rtest['type']
+            tests.append(default_runner(**rtest))
         else:
             writerr(
                 'no type defined for test \'{0}\''.format(
