@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='airbag',
-    version='0.3.0',
+    version='0.4.0',
     description='Simple testrunner written in Python',
     author='Louis Person',
     author_email='lait.kureuil@gmail.com',
