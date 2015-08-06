@@ -1,4 +1,4 @@
-from airbag.status import ExitStatus
+from airbag.status import ExitStatus, ChromeMessage as Chrome
 
 
 class CliFormatter(object):
@@ -18,11 +18,13 @@ class CliFormatter(object):
 
     def ran(self, test_result, tests_stats):
         state = self.message_bag.get_status_str(test_result.status)
-        self.stream.write('[{0}]{1}: {2}\n'.format(
-            test_result.program,
-            test_result.name,
-            state
-        ))
+        self.stream.write(
+            self.message_bag.get_chrome_str(Chrome.RAN_TEST).format(
+                test_result.program,
+                test_result.name,
+                state
+            )
+        )
         if test_result.status == ExitStatus.finished:
             for error in test_result.errors:
                 self.stream.write(
@@ -33,12 +35,12 @@ class CliFormatter(object):
 
     def ended(self, tests_results, tests_stats):
         self.stream.write(
-            'Ran {0} tests in {1:.1f} seconds.\n'.format(
+            self.message_bag.get_chrome_str(Chrome.RAN_TESTS).format(
                 tests_stats['tests'], tests_stats['elapsed']
             )
         )
         self.stream.write(
-            '[{0:.0f}%] Success: {1} | Errors: {3} | Failures: {2}\n'.format(
+            self.message_bag.get_chrome_str(Chrome.TESTS_STATS).format(
                 tests_stats['percentage'],
                 tests_stats['success'],
                 tests_stats['failures'],

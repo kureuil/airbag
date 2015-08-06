@@ -9,10 +9,7 @@ class ExitStatus(Enum):
     noexec = 5      # Program didn't execute
 
 
-class ProgramStatus(object):
-    """docstring for ProgramStatus"""
-    def __init__(self, outs, errs, program):
-        super(ProgramStatus, self).__init__()
-        self.outs = outs
-        self.errs = errs
-        self.returncode = program.returncode
+class ChromeMessage(Enum):
+    RAN_TESTS = 1
+    TESTS_STATS = 2
+    RAN_TEST = 3
