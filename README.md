@@ -24,6 +24,11 @@ optional arguments:
                         Changes the working directory
   -f FILE, --input-file FILE
                         Changes the configuration used
+  -F FORMATTER, --formatter FORMATTER
+                        Formatter used to display the output. Default is `cli`
+  -O [OUTPUTS [OUTPUTS ...]], --out-fmt [OUTPUTS [OUTPUTS ...]]
+                        Additional formatters to use with their file
+                        destination
   -V, --version         Displays the current program\'s version and exit
 ```
 
