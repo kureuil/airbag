@@ -7,8 +7,8 @@ try:
     from .testrunner import TestRunner
     from .messagebag import MessageBag
 except:
-    if (version_info < (3, 3, 0)):
-        stderr.write('Python 3.3+ is required to run this program')
+    if (version_info < (3, 4, 0)):
+        stderr.write('Python 3.4+ is required to run this program')
         exit(1)
 
 
