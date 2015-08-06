@@ -2,9 +2,10 @@ from airbag.status import ExitStatus
 
 
 class CliFormatter(object):
-    def __init__(self, message_bag):
+    def __init__(self, message_bag, stream):
         super(CliFormatter, self).__init__()
         self.message_bag = message_bag
+        self.stream = stream
 
     def batch(self, tests_results, tests_stats):
         self.started(tests_stats)
@@ -17,27 +18,27 @@ class CliFormatter(object):
 
     def ran(self, test_result, tests_stats):
         state = self.message_bag.get_status_str(test_result.status)
-        print('[{0}]{1}: {2}'.format(
+        self.stream.write('[{0}]{1}: {2}\n'.format(
             test_result.program,
             test_result.name,
             state
         ))
         if test_result.status == ExitStatus.finished:
             for error in test_result.errors:
-                print(
-                    self.message_bag
+                self.stream.write(
+                   self.message_bag
                         .get_error_str(error['type'])
-                        .format(*(error['args']))
+                        .format(*(error['args'])) + '\n'
                 )
 
     def ended(self, tests_results, tests_stats):
-        print(
-            'Ran {0} tests in {1:.1f} seconds.'.format(
+        self.stream.write(
+            'Ran {0} tests in {1:.1f} seconds.\n'.format(
                 tests_stats['tests'], tests_stats['elapsed']
             )
         )
-        print(
-            '[{0:.0f}%] Success: {1} | Errors: {3} | Failures: {2}'.format(
+        self.stream.write(
+            '[{0:.0f}%] Success: {1} | Errors: {3} | Failures: {2}\n'.format(
                 tests_stats['percentage'],
                 tests_stats['success'],
                 tests_stats['failures'],

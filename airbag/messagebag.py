@@ -20,11 +20,11 @@ m {0}'
 out'
         self.errmessages[ErrorType.SIGNALED] = 'Killed by signal {0}'
         self.errmessages[ErrorType.STDOUT_DIFFERS] = 'Standard output differs\n\
-Expected:\n{0}\nGot:\n{1}\n'
+Expected:\n{0}\nGot:\n{1}'
         self.errmessages[ErrorType.STDERR_DIFFERS] = 'Standard error differs\n\
-Expected:\n{0}\nGot:\n{1}\n'
+Expected:\n{0}\nGot:\n{1}'
         self.errmessages[ErrorType.RETURN_CODE_DIFFERS] = 'Return code differs\
-\nExpected:\n{0}\nGot:\n{1}\n'
+\nExpected:\n{0}\nGot:\n{1}'
 
     def get_status_str(self, status):
         return self.status_messages[status]

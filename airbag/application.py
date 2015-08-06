@@ -1,5 +1,5 @@
 try:
-    from sys import exit, version_info, stderr
+    from sys import exit, version_info, stdout, stderr
     import argparse
     import pkg_resources
     from os import getcwd, chdir, path
@@ -94,12 +94,28 @@ def get_message_bag():
     return MessageBag()
 
 
-def get_formatter(formatter, message_bag):
+def get_formatter(formatter, message_bag, stream):
     for v in pkg_resources.iter_entry_points(group='airbag.formatters'):
         v = v.load()
         if formatter == v.get_type():
-            return v(message_bag)
+            return v(message_bag, stream)
     raise ValueError("No formatter named {} found".format(formatter))
+
+
+def get_outputs(outputs, message_bag):
+    formatters = []
+    for output in outputs:
+        try:
+            [formatter_name, outfile] = output.split(':', maxsplit=1)
+            stream = open(outfile, 'w+')
+            formatters.append(
+                get_formatter(formatter_name, message_bag, stream)
+            ) 
+        except ValueError as e:
+            writerr('Error in formatter `{}`: {}'.format(output, e)) 
+        except OSError as e:
+            writerr('Couldn\'t open file `{}`: {}'.format(outfile, e))
+    return formatters
 
 
 def get_config(input_file, parsers):
@@ -125,6 +141,7 @@ def change_working_dir(directory=None):
 
 def get_tests(config, runners):
     tests = []
+    
     rtests = config.parse()
     for rtest in rtests:
         if 'type' in rtest and rtest['type'] is not None:
@@ -153,10 +170,14 @@ def cli():
     parsers = get_parsers()
     runners = get_runners()
     message_bag = get_message_bag()
-    formatter = get_formatter(args.formatter, message_bag)
+    formatter = get_formatter(args.formatter, message_bag, stdout)
+    outputs = get_outputs(args.out_fmt, message_bag)
+    outputs.append(formatter)
     config = get_config(args.input_file, parsers)
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)
-    testrunner = TestRunner(tests, formatter)
+    testrunner = TestRunner(tests, outputs)
     if testrunner.launch() != 0:
         exit(1)
+    for formatter in outputs:
+        formatter.stream.close()
