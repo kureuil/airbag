@@ -2,9 +2,9 @@ from enum import Enum
 from airbag.status import ExitStatus
 
 
-class TestResult(object):
+class TestResult:
     def __init__(self, name, program='', arguments=[]):
-        super(TestResult, self).__init__()
+        super().__init__()
         self.status = ExitStatus.OK
         self.errors = []
         self.name = name

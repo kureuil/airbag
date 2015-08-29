@@ -1,9 +1,9 @@
 from airbag.status import ExitStatus, ChromeMessage as Chrome
 
 
-class CliFormatter(object):
+class CliFormatter:
     def __init__(self, message_bag, stream):
-        super(CliFormatter, self).__init__()
+        super().__init__()
         self.message_bag = message_bag
         self.stream = stream
 

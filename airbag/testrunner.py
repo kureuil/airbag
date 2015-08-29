@@ -3,10 +3,10 @@ from time import time
 from .status import ExitStatus
 
 
-class TestRunner(object):
+class TestRunner:
     """docstring for TestRunner"""
     def __init__(self, tests, formatters, workers=1):
-        super(TestRunner, self).__init__()
+        super().__init__()
         self.tests = tests
         self.workers = workers
         self.formatters = formatters

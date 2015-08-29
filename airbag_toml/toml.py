@@ -1,10 +1,10 @@
 import pytoml
 
 
-class TomlConfig(object):
+class TomlConfig:
     """docstring for TomlConfig"""
     def __init__(self, contents):
-        super(TomlConfig, self).__init__()
+        super().__init__()
         self.raw = pytoml.load(contents)
 
     def parse(self):

@@ -2,9 +2,9 @@ from .status import ExitStatus, ChromeMessage as Chrome
 from .result import ErrorType
 
 
-class MessageBag(object):
+class MessageBag:
     def __init__(self):
-        super(MessageBag, self).__init__()
+        super().__init__()
         self.status_messages = {}
         self.status_messages[ExitStatus.OK] = 'OK'
         self.status_messages[ExitStatus.finished] = 'KO'

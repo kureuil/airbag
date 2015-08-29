@@ -5,7 +5,7 @@ from collections import ChainMap
 from os import environ
 
 
-class ProgramTest(object):
+class ProgramTest:
     """docstring for Test"""
     def __init__(
         self,
@@ -19,7 +19,7 @@ class ProgramTest(object):
         env=None,
         reference=None
     ):
-        super(ProgramTest, self).__init__()
+        super().__init__()
         if program == '':
             raise ValueError('Missing program path')
         self.result = TestResult(name, program=program, arguments=arguments)
