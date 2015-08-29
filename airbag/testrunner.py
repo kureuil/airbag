@@ -1,12 +1,14 @@
+from concurrent.futures import ThreadPoolExecutor
 from time import time
 from .status import ExitStatus
 
 
 class TestRunner(object):
     """docstring for TestRunner"""
-    def __init__(self, tests, formatters):
+    def __init__(self, tests, formatters, workers=1):
         super(TestRunner, self).__init__()
         self.tests = tests
+        self.workers = workers
         self.formatters = formatters
         self.tests_results = []
         self.stats = dict(successes=0,
@@ -33,17 +35,20 @@ class TestRunner(object):
         return self.stats['failures']
 
     def run_tests(self):
-        for test in self.tests:
-            result = test.run()
-            for formatter in self.formatters:
-                formatter.ran(result, self.stats)
-            if result.status is ExitStatus.OK:
-                continue
-            elif result.status in (
-                ExitStatus.killed,
-                ExitStatus.timeout,
-                ExitStatus.noexec
-            ):
-                self.stats['failures'] += 1
-            else:
-                self.stats['errors'] += 1
+        with ThreadPoolExecutor(max_workers=self.workers) as executor:
+            executor.map(self.run_test, self.tests)
+
+    def run_test(self, test):
+        result = test.run()
+        for formatter in self.formatters:
+            formatter.ran(result, self.stats)
+        if result.status is ExitStatus.OK:
+            return
+        elif result.status in (
+            ExitStatus.killed,
+            ExitStatus.timeout,
+            ExitStatus.noexec
+        ):
+            self.stats['failures'] += 1
+        else:
+            self.stats['errors'] += 1

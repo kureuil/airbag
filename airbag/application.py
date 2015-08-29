@@ -46,6 +46,13 @@ def cli_parse_args():
         help='Additional formatters to use with their file destination'
     )
     parser.add_argument(
+        '-W', '--max-workers',
+        type=int,
+        metavar='WORKERS',
+        default=1,
+        help='Max concurrent workers to run processes'
+    )
+    parser.add_argument(
         '-V', '--version',
         action='version',
         version='Airbag 0.3',
@@ -143,10 +150,10 @@ def get_tests(config, runners):
     tests = []
     rtests = config.parse()
     for rtest in rtests:
+        runner = None
         if 'type' in rtest and rtest['type'] is not None:
             try:
                 runner = runners[rtest['type']]
-                del rtest['type']
             except KeyError:
                 writerr(
                     '{0}: no runner defined for this test type'.format(
@@ -154,17 +161,17 @@ def get_tests(config, runners):
                     )
                 )
                 exit(1)
-            tests.append(runner(**rtest))
         elif rtest['type'] is None and len(runners) == 1:
-            default_runner = list(runners.values())[0]
-            del rtest['type']
-            tests.append(default_runner(**rtest))
+            runner = list(runners.values())[0]
         else:
             writerr(
                 'no type defined for test \'{0}\''.format(
                     rtest['name'] if 'name' in rtest else '[unknown]'
                 )
             )
+            exit(1)
+        del rtest['type']
+        tests.append(runner(**rtest))
     return tests
 
 
@@ -179,7 +186,7 @@ def cli():
     config = get_config(args.input_file, parsers)
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)
-    testrunner = TestRunner(tests, outputs)
+    testrunner = TestRunner(tests, outputs, workers=args.max_workers)
     if testrunner.launch() != 0:
         exit(1)
     for formatter in outputs:
