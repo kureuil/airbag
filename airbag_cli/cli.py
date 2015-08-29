@@ -48,5 +48,6 @@ class CliFormatter(object):
             )
         )
 
+    @staticmethod
     def get_type():
         return 'cli'

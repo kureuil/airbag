@@ -21,6 +21,7 @@ class TomlConfig(object):
             tests.append(test)
         return tests
 
+    @staticmethod
     def get_extension():
         return 'toml'
 

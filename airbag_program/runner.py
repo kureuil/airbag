@@ -1,6 +1,7 @@
 from subprocess import Popen, PIPE, DEVNULL, TimeoutExpired
 from airbag.status import ExitStatus
 from airbag.result import TestResult, ErrorType
+from collections import ChainMap
 from os import environ
 
 
@@ -33,10 +34,7 @@ class ProgramTest(object):
         if emptyenv is True:
             self.env = env if env is not None else None
         else:
-            self.env = environ.copy()
-            if env is not None:
-                for (k, v) in env.items():
-                    self.env[k] = v
+            self.env = ChainMap(env, environ)
 
     def run(self):
         stdout = DEVNULL
@@ -125,5 +123,6 @@ class ProgramTest(object):
             self.result.set_exit_status(ExitStatus.finished)
         return self.result
 
+    @staticmethod
     def get_type():
         return 'program'
