@@ -6,6 +6,7 @@ try:
     from .error import write as writerr
     from .testrunner import TestRunner
     from .messagebag import MessageBag
+    from .assertions import AssertionFactory
 except:
     if (version_info < (3, 4, 0)):
         stderr.write('Python 3.4+ is required to run this program')
@@ -151,6 +152,12 @@ def get_tests(config, runners):
     rtests = config.parse()
     for rtest in rtests:
         runner = None
+        assertions = []
+        if type(rtest['expected']) is str:
+            assertions.append(AssertionFactory.make('expected', rtest['expected']))
+        elif type(rtest['expected']) is dict:
+            for (assertion, value) in rtest['expected']:
+                assertions.append(AssertionFactory.make(assertion, value))
         if 'type' in rtest and rtest['type'] is not None:
             try:
                 runner = runners[rtest['type']]

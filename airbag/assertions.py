@@ -2,6 +2,8 @@ __author__ = 'person_l'
 
 
 class AssertionFactory:
+    default_assertion = 'is'
+
     registry = {}
 
     @classmethod
@@ -10,7 +12,11 @@ class AssertionFactory:
 
     @classmethod
     def make(cls, assertion_name, value):
-        return cls.registry[assertion_name](value=value)
+        assertion_type = cls.default_assertion
+        name = assertion_name
+        if '__' in assertion_name:
+            name, assertion_type = assertion_name.split('__', 1)
+        return cls.registry[assertion_type](value=value, name=name)
 
 
 def assertion(assertion_type):
