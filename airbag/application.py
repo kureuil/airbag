@@ -187,7 +187,8 @@ def cli():
     change_working_dir(args.working_dir)
     tests = get_tests(config, runners)
     testrunner = TestRunner(tests, outputs, workers=args.max_workers)
-    if testrunner.launch() != 0:
-        exit(1)
+    status = testrunner.launch()
     for formatter in outputs:
         formatter.stream.close()
+    if status != 0:
+        exit(1)
