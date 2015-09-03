@@ -1,4 +1,4 @@
-# Airbag
+# Airbag [![Build Status](https://travis-ci.org/kureuil/airbag.svg)](https://travis-ci.org/kureuil/airbag) [![Coverage Status](https://coveralls.io/repos/kureuil/airbag/badge.svg?branch=master&service=github)](https://coveralls.io/github/kureuil/airbag?branch=master)
 
 Simple testrunner written in Python.
 
