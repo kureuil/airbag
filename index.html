@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Airbag by kureuil</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Airbag</h1>
+        <h2>Simple testrunner written in Python</h2>
+        <a href="https://github.com/kureuil/airbag" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a id="airbag--" class="anchor" href="#airbag--" aria-hidden="true"><span class="octicon octicon-link"></span></a>Airbag <a href="https://travis-ci.org/kureuil/airbag"><img src="https://travis-ci.org/kureuil/airbag.svg" alt="Build Status"></a> <a href="https://coveralls.io/github/kureuil/airbag?branch=master"><img src="https://coveralls.io/repos/kureuil/airbag/badge.svg?branch=master&amp;service=github" alt="Coverage Status"></a>
+</h1>
+
+<p>Simple testrunner written in Python.</p>
+
+<h1>
+<a id="installation" class="anchor" href="#installation" aria-hidden="true"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Clone this repo and run in a terminal:</p>
+
+<div class="highlight highlight-source-shell"><pre>$ sudo python3 setup.py install</pre></div>
+
+<h1>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h1>
+
+<div class="highlight highlight-source-shell"><pre>$ airbag -h
+usage: airbag [-h] [-d DIR] [-f FILE] [-V]
+
+Runs functional tests on your programs
+
+optional arguments:
+  -h, --help            show this <span class="pl-c1">help</span> message and <span class="pl-c1">exit</span>
+  -d DIR, --working-dir DIR
+                        Changes the working directory
+  -f FILE, --input-file FILE
+                        Changes the configuration used
+  -F FORMATTER, --formatter FORMATTER
+                        Formatter used to display the output. Default is <span class="pl-s"><span class="pl-pds">`</span>cli<span class="pl-pds">`</span></span>
+  -O [OUTPUTS [OUTPUTS ...]], --out-fmt [OUTPUTS [OUTPUTS ...]]
+                        Additional formatters to use with their file
+                        destination
+  -V, --version         Displays the current program<span class="pl-cce">\'</span>s version and <span class="pl-c1">exit</span></pre></div>
+
+<p>By default, DIR will be the current working directory and FILE will be <code>airbag.toml</code>.</p>
+
+<h1>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration</h1>
+
+<p>Configuration is done inside the <code>airbag.toml</code> file, written in <a href="http://github.com/toml-lang/toml">Toml</a>.</p>
+
+<p>There's a table named <code>global</code> and a table array named <code>tests</code>. The <code>global</code> table properties' are scoped to all the tests. For each test you can define :</p>
+
+<ul>
+<li>
+<code>type</code> [string](<strong>mandatory</strong>): the test runner type</li>
+<li>
+<code>project</code> [string](default: <code>''</code>): the project name</li>
+<li>
+<code>program</code> [string](<strong>mandatory</strong>): the default program to be run</li>
+<li>
+<code>name</code> [string](default: <code>''</code>): the test's name</li>
+<li>
+<code>args</code> [array](default: <code>[]</code>): the default program arguments</li>
+<li>
+<code>input</code> [string](default: <code>''</code>): the program standard input</li>
+<li>
+<code>timeout</code> [int](default: <code>15</code>): time given to the program to finish its execution</li>
+<li>
+<code>emptyenv</code> [bool](default: <code>false</code>): should the environment be emptied before executing the program</li>
+<li>
+<code>env</code> [table](default: <code>{}</code>): environment keys to be set. Overrides already defined keys.</li>
+<li>
+<code>expected</code> [string|table](default: <code>''</code>): table to compare various things once a program executed. If it is a string, shortcut to compare stdout.
+
+<ul>
+<li>
+<code>output</code> [string](default: <code>''</code>): expected standard output. Can be a file.</li>
+<li>
+<code>errors</code> [string](default: <code>''</code>): expected standard error. Can be a file.</li>
+<li>
+<code>returncode</code> [integer](default: <code>0</code>): expected exit code.</li>
+<li>
+<code>timeout</code> [bool](default: <code>false</code>): should the program timeout?</li>
+</ul>
+</li>
+</ul>
+
+<p><code>input</code>, <code>expected.output</code> &amp; <code>expected.errors</code> can be assigned a file contents by setting their value to the file path prefixed by <code>file:</code>.</p>
+
+<h2>
+<a id="configuration-parsers" class="anchor" href="#configuration-parsers" aria-hidden="true"><span class="octicon octicon-link"></span></a>Configuration parsers</h2>
+
+<p>Configuration parsers in airbag are totally configurable. Anyone can write their own configuration parsers.</p>
+
+<p>To register a configuration parser, register a class on the <code>airbag.parsers</code> entry point. TODO: document this feature, meanwhile see <a href="https://github.com/kureuil/airbag/blob/master/airbag_toml/toml.py">toml.py</a>.</p>
+
+<p>For practical reasons, airbag ships with a toml configuration parsers.</p>
+
+<h2>
+<a id="test-runners" class="anchor" href="#test-runners" aria-hidden="true"><span class="octicon octicon-link"></span></a>Test runners</h2>
+
+<p>As for configuration parsers, test runners are totally configurable.</p>
+
+<p>To register a test runner, register a class on the <code>airbag.runners</code> entry point. TODO: document this feature, meanwhile see <a href="https://github.com/kureuil/airbag/blob/master/airbag_program/runner.py">runner.py</a>.</p>
+
+<p>For practical reasons, airbag ships with a program test runner, which you can see an example below.</p>
+
+<h1>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span class="octicon octicon-link"></span></a>Example</h1>
+
+<div class="highlight highlight-source-toml"><pre>
+[<span class="pl-en">global</span>]
+<span class="pl-smi">project</span> = <span class="pl-s"><span class="pl-pds">"</span>Dummy project<span class="pl-pds">"</span></span>
+<span class="pl-smi">program</span> = <span class="pl-s"><span class="pl-pds">"</span>foo<span class="pl-pds">"</span></span>
+<span class="pl-smi">args</span> = []
+<span class="pl-smi">type</span> = <span class="pl-s"><span class="pl-pds">"</span>program<span class="pl-pds">"</span></span>
+
+[[<span class="pl-en">tests</span>]]
+<span class="pl-smi">name</span> = <span class="pl-s"><span class="pl-pds">"</span>It should work with invalid parameters<span class="pl-pds">"</span></span>
+<span class="pl-smi">args</span> = [<span class="pl-s"><span class="pl-pds">"</span>Hello<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>World<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>--invalid-opt<span class="pl-pds">"</span></span>]
+<span class="pl-smi">expected</span> = <span class="pl-s"><span class="pl-pds">"</span><span class="pl-pds">"</span></span>
+<span class="pl-smi">emptyenv</span> = <span class="pl-c1">true</span>
+    [<span class="pl-en">tests</span>.<span class="pl-en">env</span>]
+    <span class="pl-smi">PATH</span> = <span class="pl-s"><span class="pl-pds">"</span>/usr/bin<span class="pl-pds">"</span></span>
+    <span class="pl-smi">USER</span> = <span class="pl-s"><span class="pl-pds">"</span>kureuil<span class="pl-pds">"</span></span>
+
+[[<span class="pl-en">tests</span>]]
+<span class="pl-smi">name</span> = <span class="pl-s"><span class="pl-pds">"</span>Testing another program<span class="pl-pds">"</span></span>
+<span class="pl-smi">program</span> = <span class="pl-s"><span class="pl-pds">"</span>echo<span class="pl-pds">"</span></span>
+<span class="pl-smi">args</span> = [<span class="pl-s"><span class="pl-pds">"</span>-n<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Hello<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>World<span class="pl-pds">"</span></span>]
+<span class="pl-smi">timeout</span> = <span class="pl-c1">2</span>
+<span class="pl-smi">input</span> = <span class="pl-s"><span class="pl-pds">"</span>file:input.txt<span class="pl-pds">"</span></span>
+    [<span class="pl-en">tests</span>.<span class="pl-en">expected</span>]
+    <span class="pl-smi">returncode</span> = <span class="pl-c1">0</span>
+    <span class="pl-smi">errors</span> = <span class="pl-s"><span class="pl-pds">"</span>file:empty-file.txt<span class="pl-pds">"</span></span>
+    <span class="pl-smi">output</span> = <span class="pl-s"><span class="pl-pds">"</span>Hello World<span class="pl-pds">"</span></span>
+</pre></div>
+
+<h1>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>The MIT License (MIT)</p>
+
+<p>Copyright (c) 2015 Louis "Kureuil" Person</p>
+
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/kureuil/airbag/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/kureuil/airbag/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/kureuil/airbag"></a> is maintained by <a href="https://github.com/kureuil">kureuil</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+            <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-65615181-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
